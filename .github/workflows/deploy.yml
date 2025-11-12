@@ -1,0 +1,30 @@
+name: Deploy static website to Azure Storage
+
+on:
+  push:
+    branches: [ "main" ]  # change if your default branch is different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload static site to Azure Storage
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            # If your site files are in a subfolder, replace -s . with -s ./site (for example)
+            az storage blob upload-batch \
+              --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
+              -s . \
+              -d '$web' \
+              --pattern '*' \
+              --overwrite true \
+              --no-progress \
+              --only-show-errors
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
