@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Developer Portfolio</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Google Font (you can change this if your Figma uses a different one) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -267,7 +266,7 @@
           </div>
 
           <form class="contact-form" id="contact-form">
-            <!-- For Cloud Resume, you can later hook this into a backend if you want -->
+           
             <div class="form-row">
               <label for="name">Name</label>
               <input id="contact-name" type="text" placeholder="Your name" />
@@ -338,7 +337,7 @@
       const email = document.getElementById("contact-email")?.value.trim() || "";
       const message = document.getElementById("contact-message")?.value.trim() || "";
 
-      const to = "Rickycaiden@gmail.com"; // <-- change if needed
+      const to = "Rickycaiden@gmail.com"; 
 
       const subject = encodeURIComponent(`New message from ${name || "your site visitor"}`);
 
