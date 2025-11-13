@@ -3,6 +3,9 @@ name: Deploy static website to Azure Storage
 on:
   push:
     branches: [ "main" ]  # change if your default branch is different
+    paths:
+        - "site/**"
+        - ".github/workflows/deploy.yml"
 
 jobs:
   deploy:
@@ -20,7 +23,7 @@ jobs:
             # If your site files are in a subfolder, replace -s . with -s ./site (for example)
             az storage blob upload-batch \
               --connection-string "$AZURE_STORAGE_CONNECTION_STRING" \
-              -s . \
+              -s ./site \
               -d '$web' \
               --pattern '*' \
               --overwrite true \
