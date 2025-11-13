@@ -1,0 +1,40 @@
+name: Deploy Azure Function (visits API)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-deploy.yml"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install function dependencies
+        working-directory: backend/crc-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -t .
+
+      - name: Archive function app
+        working-directory: backend
+        run: |
+          cd crc-api
+          zip -r ../function.zip .
+
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: cloudresume-crc-api   # your Function App name
+          package: backend/function.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
