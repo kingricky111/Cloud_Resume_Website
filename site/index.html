@@ -194,8 +194,8 @@
               <li>GitHub Actions</li>
             </ul>
             <div class="project-links">
-              <a href="#" class="project-link">View Live</a>
-              <a href="#" class="project-link">GitHub Repo</a>
+              <a href="www.rickycloudresume.com" class="project-link">View Live</a>
+              <a href="https://github.com/kingricky111/Cloud_Resume_Website" class="project-link">GitHub Repo</a>
             </div>
           </article>
 
@@ -266,20 +266,20 @@
             </div>
           </div>
 
-          <form class="contact-form">
+          <form class="contact-form" id="contact-form">
             <!-- For Cloud Resume, you can later hook this into a backend if you want -->
             <div class="form-row">
               <label for="name">Name</label>
-              <input id="name" type="text" placeholder="Your name" />
+              <input id="contact-name" type="text" placeholder="Your name" />
             </div>
             <div class="form-row">
               <label for="email">Email</label>
-              <input id="email" type="email" placeholder="you@example.com" />
+              <input id="contact-email" type="email" placeholder="you@example.com" />
             </div>
             <div class="form-row">
               <label for="message">Message</label>
               <textarea
-                id="message"
+                id="contact-message"
                 rows="4"
                 placeholder="Tell me about your project or role..."
               ></textarea>
@@ -323,6 +323,37 @@
       console.error("Failed to load visit count", err);
       el.textContent = "—";
     }
+  })();
+</script>
+
+<script>
+  (function () {
+    const form = document.getElementById("contact-form");
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("contact-name")?.value.trim() || "";
+      const email = document.getElementById("contact-email")?.value.trim() || "";
+      const message = document.getElementById("contact-message")?.value.trim() || "";
+
+      const to = "Rickycaiden@gmail.com"; // <-- change if needed
+
+      const subject = encodeURIComponent(`New message from ${name || "your site visitor"}`);
+
+      const bodyLines = [
+        `Name: ${name}`,
+        `Email: ${email}`,
+        "",
+        "Message:",
+        message
+      ];
+
+      const body = encodeURIComponent(bodyLines.join("\n"));
+
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    });
   })();
 </script>
 
