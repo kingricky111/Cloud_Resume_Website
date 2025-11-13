@@ -60,7 +60,7 @@ I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud 
 
 - **Cloud:** Azure
 - **IaC:** Terraform
-- **Frontend:** HTML, CSS, vanilla JavaScript
+- **Frontend:** HTML, CSS, JavaScript
 - **DNS:** Cloudflare
 - **Edge / CDN:** Azure Front Door
 - **Backend:** Azure Functions (Python)
