@@ -1,6 +1,6 @@
-###############################################
+
 # Terraform & Provider
-###############################################
+
 terraform {
   required_version = ">= 1.6.0"
   required_providers {
@@ -15,17 +15,17 @@ provider "azurerm" {
   features {}
 }
 
-###############################################
+
 # Resource Group
-###############################################
+
 resource "azurerm_resource_group" "rg" {
   name     = "${var.project}-rg"
   location = var.location
 }
 
-###############################################
+
 # Storage Account
-###############################################
+
 resource "azurerm_storage_account" "crc" {
   name                     = "${var.project}crc"
   resource_group_name      = azurerm_resource_group.rg.name
@@ -44,9 +44,9 @@ resource "azurerm_storage_account" "crc" {
   }
 }
 
-###############################################
+
 # Output the static website URL
-###############################################
+
 output "static_website_url" {
   value       = azurerm_storage_account.crc.primary_web_endpoint
   description = "Public URL of your Cloud Resume static website"
@@ -54,26 +54,26 @@ output "static_website_url" {
 
 
 
-###############################################
+
 # Azure Front Door (Standard/Premium) profile
-###############################################
+
 resource "azurerm_cdn_frontdoor_profile" "fd_profile" {
   name                = "${var.project}-fd-profile"
   resource_group_name = azurerm_resource_group.rg.name
   sku_name            = var.frontdoor_sku_name
 }
 
-###############################################
+
 # Front Door endpoint (public entrypoint)
-###############################################
+
 resource "azurerm_cdn_frontdoor_endpoint" "fd_endpoint" {
   name                     = "${var.project}-fd-endpoint"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.fd_profile.id
 }
 
-###############################################
+
 # Origin group (load balancing / health)
-###############################################
+
 resource "azurerm_cdn_frontdoor_origin_group" "fd_origin_group" {
   name                     = "${var.project}-origin-group"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.fd_profile.id
@@ -92,9 +92,9 @@ resource "azurerm_cdn_frontdoor_origin_group" "fd_origin_group" {
   }
 }
 
-###############################################
+
 # Origin: your Storage static website
-###############################################
+
 resource "azurerm_cdn_frontdoor_origin" "fd_origin" {
   name                          = "${var.project}-storage-origin"
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.fd_origin_group.id
@@ -113,9 +113,9 @@ resource "azurerm_cdn_frontdoor_origin" "fd_origin" {
 }
 
 
-###############################################
+
 # Route: connect endpoint → origin group
-###############################################
+
 resource "azurerm_cdn_frontdoor_route" "fd_route" {
   name                          = "${var.project}-route"
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.fd_endpoint.id
@@ -140,9 +140,9 @@ resource "azurerm_log_analytics_workspace" "law" {
 }
 
 
-###############################################
+
 # Application Insights (logs/metrics for Functions)
-###############################################
+
 resource "azurerm_application_insights" "ai" {
   name                = "${var.project}-ai"
   location            = azurerm_resource_group.rg.location
@@ -151,9 +151,9 @@ resource "azurerm_application_insights" "ai" {
   workspace_id        = azurerm_log_analytics_workspace.law.id
 }
 
-###############################################
+
 # Function App host plan (Consumption: Y1)
-###############################################
+
 resource "azurerm_service_plan" "func_plan" {
   name                = "${var.project}-plan"
   resource_group_name = azurerm_resource_group.rg.name
@@ -163,10 +163,10 @@ resource "azurerm_service_plan" "func_plan" {
   sku_name = "Y1" # Consumption
 }
 
-###############################################
+
 # Storage account for the Function host (required)
 # (Separate from your static-website storage)
-###############################################
+
 resource "azurerm_storage_account" "func_sa" {
   name                     = "${replace(var.project, "-", "")}funcsa"
   resource_group_name      = azurerm_resource_group.rg.name
@@ -180,9 +180,9 @@ resource "azurerm_storage_account" "func_sa" {
   }
 }
 
-###############################################
+
 # Storage account for data (Table Storage)
-###############################################
+
 resource "azurerm_storage_account" "data_sa" {
   name                     = "${replace(var.project, "-", "")}datasa"
   resource_group_name      = azurerm_resource_group.rg.name
@@ -201,9 +201,9 @@ resource "azurerm_storage_table" "visitors" {
   storage_account_name = azurerm_storage_account.data_sa.name
 }
 
-###############################################
+
 # Linux Function App (Python)
-###############################################
+
 resource "azurerm_linux_function_app" "func" {
   name                       = "${var.project}-${var.func_name}"
   resource_group_name        = azurerm_resource_group.rg.name
