@@ -13,6 +13,28 @@
     rel="stylesheet"
   />
 </head>
+
+
+<script>
+  (async () => {
+    const el = document.getElementById("visit-count");
+    if (!el) return;
+
+    try {
+      const response = await fetch("https://cloudresume-crc-api.azurewebsites.net/api/visits");
+      if (!response.ok) throw new Error("Network error");
+
+      const data = await response.json();
+      el.textContent = data.count ?? data.Count ?? "—";
+    } catch (err) {
+      console.error("Failed to load visit count", err);
+      el.textContent = "—";
+    }
+  })();
+</script>
+
+
+
 <body>
   <!-- ================= NAVBAR ================= -->
   <header class="site-header">
@@ -27,6 +49,9 @@
         <a href="#skills" class="nav-link">Skills</a>
         <a href="#projects" class="nav-link">Projects</a>
         <a href="#contact" class="nav-link">Contact</a>
+        <p class="visit-counter">
+          Visitors: <span id="visit-count">...</span>
+        </p>        
       </nav>
     </div>
   </header>
