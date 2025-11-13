@@ -14,27 +14,6 @@
   />
 </head>
 
-
-<script>
-  (async () => {
-    const el = document.getElementById("visit-count");
-    if (!el) return;
-
-    try {
-      const response = await fetch("https://cloudresume-crc-api.azurewebsites.net/api/visits");
-      if (!response.ok) throw new Error("Network error");
-
-      const data = await response.json();
-      el.textContent = data.count ?? data.Count ?? "—";
-    } catch (err) {
-      console.error("Failed to load visit count", err);
-      el.textContent = "—";
-    }
-  })();
-</script>
-
-
-
 <body>
   <!-- ================= NAVBAR ================= -->
   <header class="site-header">
@@ -328,4 +307,24 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
+
+<script>
+  (async () => {
+    const el = document.getElementById("visit-count");
+    if (!el) return;
+
+    try {
+      const response = await fetch("https://cloudresume-crc-api.azurewebsites.net/api/visits");
+      if (!response.ok) throw new Error("Network error");
+
+      const data = await response.json();
+      el.textContent = data.count ?? data.Count ?? "—";
+    } catch (err) {
+      console.error("Failed to load visit count", err);
+      el.textContent = "—";
+    }
+  })();
+</script>
+
+
 </html>
