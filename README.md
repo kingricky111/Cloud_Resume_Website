@@ -1,0 +1,337 @@
+
+````markdown
+# Cloud Resume Challenge – Azure Edition
+
+Live site: **https://www.rickycloudresume.com**
+
+This project is my implementation of the **Cloud Resume Challenge** on **Microsoft Azure**.  
+It’s a fully automated, Terraform-driven, cloud-hosted resume site with a serverless backend and CI/CD pipelines.
+
+I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud environment and am transitioning into Cloud / DevOps roles. This project is designed to showcase that transition: Terraform, Azure infrastructure, CI/CD, and serverless architecture.
+
+---
+
+## ✨ Features
+
+- **Static resume website** built from a Figma developer portfolio template  
+- **Custom domain** – `www.rickycloudresume.com`  
+- **HTTPS everywhere** using Azure Front Door managed certificates  
+- **Visitor counter** implemented with:
+  - Azure Functions (Python)
+  - Azure Table Storage
+  - JavaScript frontend
+- **Infrastructure as Code** using Terraform:
+  - Resource Group
+  - Storage Accounts (static site + function + data)
+  - Azure Front Door (profile, endpoint, origin, routes, custom domain)
+  - Function App (Linux, Python)
+  - Log Analytics + Application Insights
+- **CI/CD with GitHub Actions**:
+  - Frontend: deploy static site to Azure Storage `$web`
+  - Backend: package and deploy function app code
+
+---
+
+## 🧱 Architecture
+
+**High-level flow:**
+
+1. User opens `https://www.rickycloudresume.com`.
+2. DNS (Cloudflare) routes `www` to the Azure Front Door endpoint.
+3. Azure Front Door forwards traffic to the static website in Azure Storage.
+4. The page loads and a small JavaScript snippet calls:
+   `https://cloudresume-crc-api.azurewebsites.net/api/visits`
+5. Azure Functions (Python) reads/increments a record in **Azure Table Storage** and returns the updated count.
+6. The visitor count is rendered in the navbar as **Visitors: N**.
+
+**Main Azure components:**
+
+- **Azure Storage (static website)** – hosts `index.html`, `styles.css`, assets
+- **Azure Front Door** – global entry point, HTTPS offload, routing
+- **Azure Storage (data)** – holds `visitors` table
+- **Azure Storage (function)** – backing storage for the Function App
+- **Azure Functions (Python)** – serverless API for the visitor counter
+- **Log Analytics + Application Insights** – logging, metrics, tracing
+- **Cloudflare DNS** – public DNS + CNAME to the Front Door endpoint
+
+---
+
+## 🧰 Tech Stack
+
+- **Cloud:** Azure
+- **IaC:** Terraform
+- **Frontend:** HTML, CSS, vanilla JavaScript
+- **DNS:** Cloudflare
+- **Edge / CDN:** Azure Front Door
+- **Backend:** Azure Functions (Python)
+- **Data:** Azure Table Storage
+- **Monitoring:** Azure Monitor, Application Insights, Log Analytics
+- **CI/CD:** GitHub Actions
+
+---
+
+## 📁 Repository Structure
+
+```text
+.
+├── site/                       # Static front-end site
+│   ├── index.html
+│   ├── styles.css
+│   └── assets/
+│
+├── backend/
+│   └── crc-api/                # Azure Functions project (Python)
+│       ├── host.json
+│       ├── requirements.txt
+│       └── visits/
+│           ├── __init__.py
+│           └── function.json
+│
+├── terraform-azure-CRC/        # Terraform IaC for all Azure infrastructure
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+│
+└── .github/
+    └── workflows/
+        ├── deploy.yml          # Deploy static site to Azure Storage
+        └── backend-deploy.yml  # Deploy Azure Function from backend/crc-api
+````
+
+---
+
+## 🌐 Frontend
+
+The frontend is a single-page static site in `site/`, built from a modern developer portfolio Figma template and customized with my own:
+
+* Summary & headline (Associate Systems Engineer → Cloud / DevOps)
+* Skills and technology stack
+* Projects (including this Cloud Resume)
+* Contact section and social links (GitHub, LinkedIn, resume PDF)
+
+### Visitor Counter (JavaScript)
+
+The visitor counter shows up in the navbar as:
+
+```html
+<p class="visit-counter">
+  Visitors: <span id="visit-count">...</span>
+</p>
+```
+
+The script at the bottom of `index.html` calls the Azure Function:
+
+```html
+<script>
+  (async () => {
+    const el = document.getElementById("visit-count");
+    if (!el) return;
+
+    try {
+      const response = await fetch("https://cloudresume-crc-api.azurewebsites.net/api/visits");
+      if (!response.ok) throw new Error("Network error");
+
+      const data = await response.json();
+      el.textContent = data.count ?? data.Count ?? "—";
+    } catch (err) {
+      console.error("Failed to load visit count", err);
+      el.textContent = "—";
+    }
+  })();
+</script>
+```
+
+---
+
+## 🧮 Backend – Azure Function + Table Storage
+
+The backend is a simple **HTTP-triggered** Azure Function in `backend/crc-api/visits`.
+
+Every time the JS loads the page, it hits `/api/visits`:
+
+* Reads a single entity from the `visitors` table (`PartitionKey="counter"`, `RowKey="site"`)
+* If it exists, increments the `Count` property
+* If it doesn’t exist, creates it with `Count = 1`
+* Returns `{ "count": <currentCount> }` as JSON
+
+Key parts of `__init__.py`:
+
+```python
+import logging
+import os
+import json
+
+import azure.functions as func
+from azure.data.tables import TableServiceClient
+from azure.core.exceptions import ResourceNotFoundError
+
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Processing visit count request")
+
+    conn_str = os.getenv("TABLES_CONNECTION_STRING")
+    table_name = os.getenv("TABLES_TABLE_NAME")
+
+    service = TableServiceClient.from_connection_string(conn_str)
+    table_client = service.get_table_client(table_name)
+
+    partition_key = "counter"
+    row_key = "site"
+
+    try:
+        entity = table_client.get_entity(partition_key=partition_key, row_key=row_key)
+        current_count = int(entity.get("Count", 0))
+        new_count = current_count + 1
+        entity["Count"] = new_count
+        table_client.update_entity(entity)
+    except ResourceNotFoundError:
+        new_count = 1
+        entity = {
+            "PartitionKey": partition_key,
+            "RowKey": row_key,
+            "Count": new_count,
+        }
+        table_client.create_entity(entity)
+
+    body = json.dumps({"count": new_count})
+
+    return func.HttpResponse(
+        body,
+        status_code=200,
+        mimetype="application/json",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+        },
+    )
+```
+
+The Function App is configured via Terraform to expose:
+
+* `TABLES_CONNECTION_STRING`
+* `TABLES_TABLE_NAME`
+
+as app settings.
+
+---
+
+## ☁️ Infrastructure as Code (Terraform)
+
+All Azure resources are declared in `terraform-azure-CRC/`. Highlights:
+
+* **Resource Group**
+* **Static Website Storage Account**
+
+  * Enables `$web` static site hosting
+* **Function Host Storage Account**
+* **Data Storage Account**
+
+  * Creates `visitors` table
+* **Azure Front Door (Standard/Premium)**
+
+  * Profile, endpoint, origin group, origin
+  * Routes for:
+
+    * Front Door default hostname
+    * `www.rickycloudresume.com` custom domain
+* **Custom Domain**
+
+  * `www.rickycloudresume.com` bound to Front Door
+  * AFD-managed certificate + DNS validation
+* **App Service Plan (Linux, Y1 consumption)**
+* **Linux Function App**
+
+  * Python 3.10 stack
+  * CORS configured for:
+
+    * `https://www.rickycloudresume.com`
+    * Front Door endpoint hostname
+* **Log Analytics Workspace + Application Insights**
+
+Terraform outputs expose key values such as:
+
+* Static website primary endpoint
+* Front Door endpoint hostname
+* Function default hostname
+
+---
+
+## 🔁 CI/CD – GitHub Actions
+
+### Frontend deploy (`.github/workflows/deploy.yml`)
+
+Triggered on pushes to `main` that touch `site/`:
+
+1. Checks out the repo
+2. Uses `az storage blob upload-batch` to sync `./site` → `$web` container in the static site Storage Account
+3. Connection string is stored as GitHub secret:
+
+   * `AZURE_STORAGE_CONNECTION_STRING`
+
+### Backend deploy (`.github/workflows/backend-deploy.yml`)
+
+Triggered on pushes to `main` that touch `backend/**`:
+
+1. Checks out the repo
+2. Installs Python 3.10
+3. Installs function dependencies into `backend/crc-api`
+4. Zips the function app
+5. Deploys it to `cloudresume-crc-api` via `Azure/functions-action@v1` using a publish profile secret:
+
+   * `AZURE_FUNCTIONAPP_PUBLISH_PROFILE`
+
+This gives me continuous deployment for both the **static frontend** and the **serverless backend** from the same repository.
+
+---
+
+## 🧪 Local Development
+
+### Frontend
+
+```bash
+cd site
+# Optionally use a simple live server (VS Code extension, or):
+python -m http.server 8000
+```
+
+Open `http://localhost:8000` and the site will load.
+The visitor counter will not work locally unless you point the JS to the live Function App URL (which it currently does).
+
+### Backend
+
+Install the Azure Functions Core Tools if you want to run the Function locally, or just keep deploying via GitHub Actions and test against:
+
+```text
+https://cloudresume-crc-api.azurewebsites.net/api/visits
+```
+
+---
+
+## 📌 Resume-Ready Highlights
+
+This project demonstrates:
+
+* Designing and deploying a **production-style cloud architecture** on Azure
+* Managing **all infrastructure via Terraform**
+* Using **Azure Front Door** with a **custom domain** and managed certificates
+* Building a **serverless backend** with Azure Functions + Table Storage
+* Implementing **CI/CD pipelines** with GitHub Actions for both frontend and backend
+* Integrating **monitoring and logging** with Log Analytics and Application Insights
+* Working with **Cloudflare DNS** in front of Azure resources
+* Debugging real-world issues: regional quotas, workspace-based Application Insights, custom domain validation, CORS, etc.
+
+These are the exact skills I want to apply in **Cloud / DevOps engineer** roles.
+
+---
+
+## 🚀 Future Improvements
+
+* Add unit tests for the Azure Function and run them in CI
+* Add a Terraform GitHub Actions workflow (plan/apply on PR/merge)
+* Extend the site with additional projects and blog posts
+* Add uptime checks and alerts via Azure Monitor or GitHub Actions scheduled workflows
+* Add a contact form backed by another Azure Function or Logic App
+
+```
+
+
