@@ -289,6 +289,7 @@
     width: 72px;
     height: 72px;
     border-radius: 24px;
+    overflow: hidden;
     background: radial-gradient(circle at 30% 0, #0ea5e9, #0f172a 70%);
     display: flex;
     align-items: center;
@@ -297,12 +298,12 @@
     border: 1px solid rgba(148, 163, 184, 0.45);
   }
   
-  .avatar-initials {
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: 0.08em;
-    color: #e5e7eb;
-  }
+  .avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;             
+  display: block;
+}
   
   .hero-card-body {
     position: relative;
