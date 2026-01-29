@@ -7,3 +7,9 @@ crash.log
 terraform.tfvars
 terraform.tfvars.json
 .terraform.tfstate.lock.info
+.venv/
+venv/
+__pycache__/
+*.pyc
+.vscode/
+.env
