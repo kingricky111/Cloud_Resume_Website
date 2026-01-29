@@ -1,0 +1,9 @@
+services:
+  crc-api:
+    build:
+      context: ../..
+      dockerfile: Infrastructure/docker/dockerfile 
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../.env

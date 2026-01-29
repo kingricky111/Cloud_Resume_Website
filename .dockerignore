@@ -1,0 +1,6 @@
+.git
+.venv
+terraform-azure-CRC
+site
+backend/crc-api/visits
+backend/crc-api/host.json
