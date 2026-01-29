@@ -79,13 +79,22 @@ I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud 
 │   ├── styles.css
 │   └── assets/
 │
-├── backend/
-│   └── crc-api/                # Azure Functions project (Python)
+├── ├── backend/
+│   └── crc-api/
 │       ├── host.json
 │       ├── requirements.txt
-│       └── visits/
-│           ├── __init__.py
-│           └── function.json
+│       ├── visits/                   # Azure Functions implementation (Project 1)
+│       │   ├── __init__.py
+│       │   └── function.json
+│       └── api-container/            # Containerized API (Project 2)
+│           ├── app.py
+│           └── requirements.txt
+│
+├── Infrastructure/
+│   └── docker/                       # Docker + Compose (Project 2)
+│       ├── dockerfile
+│       ├── docker-compose.yml
+│       └── README.md
 │
 ├── terraform-azure-CRC/        # Terraform IaC for all Azure infrastructure
 │   ├── main.tf
@@ -97,7 +106,16 @@ I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud 
         ├── deploy.yml          # Deploy static site to Azure Storage
         └── backend-deploy.yml  # Deploy Azure Function from backend/crc-api
 ````
+---
 
+## Extensions Beyond the Base Challenge
+
+After completing the Cloud Resume Challenge using Azure-native services (Azure Functions + Front Door + Terraform), I extended the same backend functionality into additional deployment models:
+
+- **Project 2 (Docker):** A containerized FastAPI version of the `/visits` API that connects to the same Azure Table Storage (for portability + local dev + future orchestration).
+- **Project 3 (planned):** Kubernetes deployment of the containerized API.
+
+These extensions live alongside the Azure Functions implementation — they don’t replace it.
 ---
 
 ## 🌐 Frontend
