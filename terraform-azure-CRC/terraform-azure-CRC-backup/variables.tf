@@ -49,3 +49,8 @@ variable "functions_location" {
   type        = string
   default     = "centralus"
 }
+
+variable "alert_email" {
+  description = "email to recieve alerts"
+  type        = string 
+}

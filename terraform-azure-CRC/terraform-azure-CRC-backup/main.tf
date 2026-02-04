@@ -151,6 +151,59 @@ resource "azurerm_application_insights" "ai" {
   workspace_id        = azurerm_log_analytics_workspace.law.id
 }
 
+resource "azurerm_monitor_action_group" "alerts" {
+  name                = "${var.project}-alerts"
+  resource_group_name = azurerm_resource_group.rg.name
+  short_name          = "alerts"
+  
+  email_receiver {
+    name          = "primary"
+    email_address = var.alert_email
+  } 
+}
+
+resource "azurerm_monitor_metric_alert" "failed_requests" {
+  name                = "${var.project}-failed-requests"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              =  [azurerm_application_insights.ai.id]
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT5M"
+
+  criteria {
+    metric_namespace = "Microsoft.Insights/components"
+    metric_name = "requests/failed"
+    aggregation = "Count"
+    operator = "GreaterThan"
+    threshold = 5
+    skip_metric_validation = true
+  }
+  action {
+    action_group_id = azurerm_monitor_action_group.alerts.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "high_latency" {
+  name                = "${var.project}-high-latency"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              =  [azurerm_application_insights.ai.id]
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT5M"
+
+  criteria {
+    metric_namespace = "Microsoft.Insights/components"
+    metric_name = "requests/duration"
+    aggregation = "Average"
+    operator = "GreaterThan"
+    threshold = 1000 # ms
+  }
+  action {
+    action_group_id = azurerm_monitor_action_group.alerts.id
+  }
+}
+
+
 
 # Function App host plan (Consumption: Y1)
 

@@ -302,52 +302,24 @@ This gives me continuous deployment for both the **static frontend** and the **s
 
 ---
 
-## 🧪 Local Development
-
-### Frontend
-
-```bash
-cd site
-# Optionally use a simple live server (VS Code extension, or):
-python -m http.server 8000
-```
-
-Open `http://localhost:8000` and the site will load.
-The visitor counter will not work locally unless you point the JS to the live Function App URL (which it currently does).
-
-### Backend
-
-Install the Azure Functions Core Tools if you want to run the Function locally, or just keep deploying via GitHub Actions and test against:
-
-```text
-https://cloudresume-crc-api.azurewebsites.net/api/visits
-```
-
----
-
-## 📌 Resume-Ready Highlights
+## 
 
 This project demonstrates:
 
 * Designing and deploying a **production-style cloud architecture** on Azure
 * Managing **all infrastructure via Terraform**
-* Using **Azure Front Door** with a **custom domain** and managed certificates
+* Configuring **Azure Front Door** with a **custom domain** and managed TLS certificates
 * Building a **serverless backend** with Azure Functions + Table Storage
 * Implementing **CI/CD pipelines** with GitHub Actions for both frontend and backend
 * Integrating **monitoring and logging** with Log Analytics and Application Insights
-* Working with **Cloudflare DNS** in front of Azure resources
+* Managing **Cloudflare DNS** in front of Azure resources
 * Debugging real-world issues: regional quotas, workspace-based Application Insights, custom domain validation, CORS, etc.
 
-These are the exact skills I want to apply in **Cloud / DevOps engineer** roles.
 
 ---
 
 ## 🚀 Future Improvements
-
-* Add unit tests for the Azure Function and run them in CI
-* Add a Terraform GitHub Actions workflow (plan/apply on PR/merge)
 * Extend the site with additional projects and blog posts
-* Add uptime checks and alerts via Azure Monitor or GitHub Actions scheduled workflows
 * Add a contact form backed by another Azure Function or Logic App
 
 ```
