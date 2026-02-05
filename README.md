@@ -124,8 +124,6 @@ These extensions live alongside the Azure Functions implementation — they do n
 
 ### Planned work
 - **Kubernetes:** Deploy the containerized API to Kubernetes to explore orchestration, scaling, and service management.
-
-These extensions live alongside the Azure Functions implementation — they don’t replace it.
 ---
 
 ## 🌐 Frontend
