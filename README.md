@@ -110,10 +110,6 @@ I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud 
 
 ## Extensions Beyond the Base Challenge
 
-After completing the Cloud Resume Challenge using Azure-native services (Azure Functions + Front Door + Terraform), I extended the same backend functionality into additional deployment models:
-
-## Extensions Beyond the Base Challenge
-
 After completing the Cloud Resume Challenge using Azure-native services (Azure Functions + Front Door + Terraform), I extended the project in two directions:
 
 - **Project 2 (Docker):** A containerized FastAPI version of the `/visits` API that connects to the same Azure Table Storage, enabling portability, local development, and future orchestration.
