@@ -112,8 +112,18 @@ I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud 
 
 After completing the Cloud Resume Challenge using Azure-native services (Azure Functions + Front Door + Terraform), I extended the same backend functionality into additional deployment models:
 
-- **Project 2 (Docker):** A containerized FastAPI version of the `/visits` API that connects to the same Azure Table Storage (for portability + local dev + future orchestration).
-- **Project 3 (planned):** Kubernetes deployment of the containerized API.
+## Extensions Beyond the Base Challenge
+
+After completing the Cloud Resume Challenge using Azure-native services (Azure Functions + Front Door + Terraform), I extended the project in two directions:
+
+- **Project 2 (Docker):** A containerized FastAPI version of the `/visits` API that connects to the same Azure Table Storage, enabling portability, local development, and future orchestration.
+
+- **Project 3 (Monitoring & Observability):** Production-style monitoring and alerting added to the live Azure deployment using Azure Monitor, Application Insights, and Log Analytics. This work focuses on operating and observing an existing cloud application rather than introducing new infrastructure.
+
+These extensions live alongside the Azure Functions implementation — they do not replace it.
+
+### Planned work
+- **Kubernetes:** Deploy the containerized API to Kubernetes to explore orchestration, scaling, and service management.
 
 These extensions live alongside the Azure Functions implementation — they don’t replace it.
 ---
@@ -299,6 +309,27 @@ Triggered on pushes to `main` that touch `backend/**`:
    * `AZURE_FUNCTIONAPP_PUBLISH_PROFILE`
 
 This gives me continuous deployment for both the **static frontend** and the **serverless backend** from the same repository.
+
+---
+
+## 📊 Monitoring & Observability
+
+This project includes production-style monitoring and alerting to ensure visibility into application health and behavior.
+
+Monitoring is implemented using **Azure Application Insights**, **Azure Monitor**, and **Log Analytics**, and focuses on the following signals:
+
+- **Request volume** – tracking total incoming API requests over time
+- **Failed requests** – identifying error conditions and unsuccessful responses
+- **Response time (latency)** – measuring backend performance and degradation
+- **Application logs & traces** – enabling debugging and root-cause analysis
+
+Metric-based alerts are configured in **Azure Monitor** to notify on:
+- Elevated error rates
+- Increased average response time
+
+Dashboards and metrics were validated using real traffic and test requests to confirm correct telemetry and alert behavior.
+
+This monitoring work is treated as a separate portfolio project focused on operating and observing a live cloud application, rather than building new infrastructure.
 
 ---
 
