@@ -14,7 +14,7 @@ variable "location" {
 variable "custom_domain_name" {
   description = "Root custom domain for the resume site (no www). Example: mycloudresume.com"
   type        = string
-  default     = "rickycloudresume.com" # 🔁 change this when you know your domain
+  default     = "rickycloudresume.com" 
 }
 
 # Front Door SKU
