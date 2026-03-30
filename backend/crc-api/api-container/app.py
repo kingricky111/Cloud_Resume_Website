@@ -11,10 +11,10 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
-# CORS (mirrors what you had configured already)
+# CORS 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://www.rickycloudresume.com"],
     allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
 )

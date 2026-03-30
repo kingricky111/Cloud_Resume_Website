@@ -47,13 +47,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     body = json.dumps({"count": new_count})
 
-    # CORS is already configured in Terraform, but we can be extra-safe here
+    
     return func.HttpResponse(
         body,
         status_code=200,
         mimetype="application/json",
         headers={
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": "https://www.rickycloudresume.com",
             "Access-Control-Allow-Methods": "GET, OPTIONS",
         },
     )
