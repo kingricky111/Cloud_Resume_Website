@@ -5,7 +5,7 @@
 Live site: **https://www.rickycloudresume.com**
 
 This project is my implementation of the **Cloud Resume Challenge** on **Microsoft Azure**.  
-It’s a fully automated, Terraform-driven, cloud-hosted resume site with a serverless backend and CI/CD pipelines.
+Infrastructure is defined in Terraform, with a serverless backend and automated deployments via GitHub Actions.
 
 I currently work as an **Associate Systems Engineer** in a hybrid on-prem/cloud environment and am transitioning into Cloud / DevOps roles.
 
